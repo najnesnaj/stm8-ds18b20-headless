@@ -1,0 +1,787 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ANSI-C Compiler
+                                      3 ; Version 3.5.0 #9253 (Apr  3 2018) (Linux)
+                                      4 ; This file was generated Wed Dec 30 20:13:01 2020
+                                      5 ;--------------------------------------------------------
+                                      6 	.module blink
+                                      7 	.optsdcc -mstm8
+                                      8 	
+                                      9 ;--------------------------------------------------------
+                                     10 ; Public variables in this module
+                                     11 ;--------------------------------------------------------
+                                     12 	.globl _main
+                                     13 	.globl _DS18B20_ReadTemperature
+                                     14 	.globl _DS18B20_ReadByte
+                                     15 	.globl _DS18B20_WriteByte
+                                     16 	.globl _DS18B20_Init
+                                     17 	.globl _send
+                                     18 	.globl _short_pulse
+                                     19 	.globl _long_pulse
+                                     20 	.globl _delayTenMicro
+                                     21 	.globl __delay_us
+                                     22 	.globl _InitializeSystemClock
+                                     23 ;--------------------------------------------------------
+                                     24 ; ram data
+                                     25 ;--------------------------------------------------------
+                                     26 	.area DATA
+                                     27 ;--------------------------------------------------------
+                                     28 ; ram data
+                                     29 ;--------------------------------------------------------
+                                     30 	.area INITIALIZED
+                                     31 ;--------------------------------------------------------
+                                     32 ; Stack segment in internal ram 
+                                     33 ;--------------------------------------------------------
+                                     34 	.area	SSEG
+      000000                         35 __start__stack:
+      000000                         36 	.ds	1
+                                     37 
+                                     38 ;--------------------------------------------------------
+                                     39 ; absolute external ram data
+                                     40 ;--------------------------------------------------------
+                                     41 	.area DABS (ABS)
+                                     42 ;--------------------------------------------------------
+                                     43 ; interrupt vector 
+                                     44 ;--------------------------------------------------------
+                                     45 	.area HOME
+      000000                         46 __interrupt_vect:
+      000000 82v00u00u00             47 	int s_GSINIT ;reset
+      000004 82 00 00 00             48 	int 0x0000 ;trap
+      000008 82 00 00 00             49 	int 0x0000 ;int0
+      00000C 82 00 00 00             50 	int 0x0000 ;int1
+      000010 82 00 00 00             51 	int 0x0000 ;int2
+      000014 82 00 00 00             52 	int 0x0000 ;int3
+      000018 82 00 00 00             53 	int 0x0000 ;int4
+      00001C 82 00 00 00             54 	int 0x0000 ;int5
+      000020 82 00 00 00             55 	int 0x0000 ;int6
+      000024 82 00 00 00             56 	int 0x0000 ;int7
+      000028 82 00 00 00             57 	int 0x0000 ;int8
+      00002C 82 00 00 00             58 	int 0x0000 ;int9
+      000030 82 00 00 00             59 	int 0x0000 ;int10
+      000034 82 00 00 00             60 	int 0x0000 ;int11
+      000038 82 00 00 00             61 	int 0x0000 ;int12
+      00003C 82 00 00 00             62 	int 0x0000 ;int13
+      000040 82 00 00 00             63 	int 0x0000 ;int14
+      000044 82 00 00 00             64 	int 0x0000 ;int15
+      000048 82 00 00 00             65 	int 0x0000 ;int16
+      00004C 82 00 00 00             66 	int 0x0000 ;int17
+      000050 82 00 00 00             67 	int 0x0000 ;int18
+      000054 82 00 00 00             68 	int 0x0000 ;int19
+      000058 82 00 00 00             69 	int 0x0000 ;int20
+      00005C 82 00 00 00             70 	int 0x0000 ;int21
+      000060 82 00 00 00             71 	int 0x0000 ;int22
+      000064 82 00 00 00             72 	int 0x0000 ;int23
+      000068 82 00 00 00             73 	int 0x0000 ;int24
+      00006C 82 00 00 00             74 	int 0x0000 ;int25
+      000070 82 00 00 00             75 	int 0x0000 ;int26
+      000074 82 00 00 00             76 	int 0x0000 ;int27
+      000078 82 00 00 00             77 	int 0x0000 ;int28
+      00007C 82 00 00 00             78 	int 0x0000 ;int29
+                                     79 ;--------------------------------------------------------
+                                     80 ; global & static initialisations
+                                     81 ;--------------------------------------------------------
+                                     82 	.area HOME
+                                     83 	.area GSINIT
+                                     84 	.area GSFINAL
+                                     85 	.area GSINIT
+      000000                         86 __sdcc_gs_init_startup:
+      000000                         87 __sdcc_init_data:
+                                     88 ; stm8_genXINIT() start
+      000000 AEr00r00         [ 2]   89 	ldw x, #l_DATA
+      000003 27 07            [ 1]   90 	jreq	00002$
+      000005                         91 00001$:
+      000005 72 4FuFFuFF      [ 1]   92 	clr (s_DATA - 1, x)
+      000009 5A               [ 2]   93 	decw x
+      00000A 26 F9            [ 1]   94 	jrne	00001$
+      00000C                         95 00002$:
+      00000C AEr00r00         [ 2]   96 	ldw	x, #l_INITIALIZER
+      00000F 27 09            [ 1]   97 	jreq	00004$
+      000011                         98 00003$:
+      000011 D6uFFuFF         [ 1]   99 	ld	a, (s_INITIALIZER - 1, x)
+      000014 D7uFFuFF         [ 1]  100 	ld	(s_INITIALIZED - 1, x), a
+      000017 5A               [ 2]  101 	decw	x
+      000018 26 F7            [ 1]  102 	jrne	00003$
+      00001A                        103 00004$:
+                                    104 ; stm8_genXINIT() end
+                                    105 	.area GSFINAL
+      000000 CCr00r80         [ 2]  106 	jp	__sdcc_program_startup
+                                    107 ;--------------------------------------------------------
+                                    108 ; Home
+                                    109 ;--------------------------------------------------------
+                                    110 	.area HOME
+                                    111 	.area HOME
+      000080                        112 __sdcc_program_startup:
+      000080 CCr02r78         [ 2]  113 	jp	_main
+                                    114 ;	return from main will return to caller
+                                    115 ;--------------------------------------------------------
+                                    116 ; code
+                                    117 ;--------------------------------------------------------
+                                    118 	.area CODE
+                                    119 ;	blink.c: 25: void InitializeSystemClock() {
+                                    120 ;	-----------------------------------------
+                                    121 ;	 function InitializeSystemClock
+                                    122 ;	-----------------------------------------
+      000000                        123 _InitializeSystemClock:
+                                    124 ;	blink.c: 26: CLK_ICKR = 0;                       //  Reset the Internal Clock Register.
+      000000 35 00 50 C0      [ 1]  125 	mov	0x50c0+0, #0x00
+                                    126 ;	blink.c: 27: CLK_ICKR = CLK_HSIEN;               //  Enable the HSI.
+      000004 35 01 50 C0      [ 1]  127 	mov	0x50c0+0, #0x01
+                                    128 ;	blink.c: 28: CLK_ECKR = 0;                       //  Disable the external clock.
+      000008 35 00 50 C1      [ 1]  129 	mov	0x50c1+0, #0x00
+                                    130 ;	blink.c: 29: while ((CLK_ICKR & CLK_HSIRDY) == 0);       //  Wait for the HSI to be ready for use.
+      00000C                        131 00101$:
+      00000C AE 50 C0         [ 2]  132 	ldw	x, #0x50c0
+      00000F F6               [ 1]  133 	ld	a, (x)
+      000010 A5 02            [ 1]  134 	bcp	a, #0x02
+      000012 27 F8            [ 1]  135 	jreq	00101$
+                                    136 ;	blink.c: 30: CLK_CKDIVR = 0;                     //  Ensure the clocks are running at full speed.
+      000014 35 00 50 C6      [ 1]  137 	mov	0x50c6+0, #0x00
+                                    138 ;	blink.c: 31: CLK_PCKENR1 = 0xff;                 //  Enable all peripheral clocks.
+      000018 35 FF 50 C7      [ 1]  139 	mov	0x50c7+0, #0xff
+                                    140 ;	blink.c: 32: CLK_PCKENR2 = 0xff;                 //  Ditto.
+      00001C 35 FF 50 CA      [ 1]  141 	mov	0x50ca+0, #0xff
+                                    142 ;	blink.c: 33: CLK_CCOR = 0;                       //  Turn off CCO.
+      000020 35 00 50 C9      [ 1]  143 	mov	0x50c9+0, #0x00
+                                    144 ;	blink.c: 34: CLK_HSITRIMR = 0;                   //  Turn off any HSIU trimming.
+      000024 35 00 50 CC      [ 1]  145 	mov	0x50cc+0, #0x00
+                                    146 ;	blink.c: 35: CLK_SWIMCCR = 0;                    //  Set SWIM to run at clock / 2.
+      000028 35 00 50 CD      [ 1]  147 	mov	0x50cd+0, #0x00
+                                    148 ;	blink.c: 36: CLK_SWR = 0xe1;                     //  Use HSI as the clock source.
+      00002C 35 E1 50 C4      [ 1]  149 	mov	0x50c4+0, #0xe1
+                                    150 ;	blink.c: 37: CLK_SWCR = 0;                       //  Reset the clock switch control register.
+      000030 35 00 50 C5      [ 1]  151 	mov	0x50c5+0, #0x00
+                                    152 ;	blink.c: 38: CLK_SWCR = CLK_SWEN;                //  Enable switching.
+      000034 35 02 50 C5      [ 1]  153 	mov	0x50c5+0, #0x02
+                                    154 ;	blink.c: 39: while ((CLK_SWCR & CLK_SWBSY) != 0);        //  Pause while the clock switch is busy.
+      000038                        155 00104$:
+      000038 AE 50 C5         [ 2]  156 	ldw	x, #0x50c5
+      00003B F6               [ 1]  157 	ld	a, (x)
+      00003C 44               [ 1]  158 	srl	a
+      00003D 25 F9            [ 1]  159 	jrc	00104$
+      00003F 81               [ 4]  160 	ret
+                                    161 ;	blink.c: 42: void _delay_us(unsigned int i)
+                                    162 ;	-----------------------------------------
+                                    163 ;	 function _delay_us
+                                    164 ;	-----------------------------------------
+      000040                        165 __delay_us:
+                                    166 ;	blink.c: 44: i *= 3;
+      000040 1E 03            [ 2]  167 	ldw	x, (0x03, sp)
+      000042 89               [ 2]  168 	pushw	x
+      000043 4B 03            [ 1]  169 	push	#0x03
+      000045 4B 00            [ 1]  170 	push	#0x00
+      000047 CDr00r00         [ 4]  171 	call	__mulint
+      00004A 5B 04            [ 2]  172 	addw	sp, #4
+      00004C 1F 03            [ 2]  173 	ldw	(0x03, sp), x
+                                    174 ;	blink.c: 45: while(--i);
+      00004E 1E 03            [ 2]  175 	ldw	x, (0x03, sp)
+      000050                        176 00101$:
+      000050 5A               [ 2]  177 	decw	x
+      000051 5D               [ 2]  178 	tnzw	x
+      000052 26 FC            [ 1]  179 	jrne	00101$
+      000054 81               [ 4]  180 	ret
+                                    181 ;	blink.c: 50: void delayTenMicro (void) {
+                                    182 ;	-----------------------------------------
+                                    183 ;	 function delayTenMicro
+                                    184 ;	-----------------------------------------
+      000055                        185 _delayTenMicro:
+      000055 52 04            [ 2]  186 	sub	sp, #4
+                                    187 ;	blink.c: 52: for (a = 0; a < 16000; ++a)
+      000057 AE 3E 80         [ 2]  188 	ldw	x, #0x3e80
+      00005A 1F 03            [ 2]  189 	ldw	(0x03, sp), x
+      00005C 5F               [ 1]  190 	clrw	x
+      00005D 1F 01            [ 2]  191 	ldw	(0x01, sp), x
+      00005F                        192 00104$:
+                                    193 ;	blink.c: 53: __asm__("nop");
+      00005F 9D               [ 1]  194 	nop
+      000060 16 03            [ 2]  195 	ldw	y, (0x03, sp)
+      000062 72 A2 00 01      [ 2]  196 	subw	y, #0x0001
+      000066 7B 02            [ 1]  197 	ld	a, (0x02, sp)
+      000068 A2 00            [ 1]  198 	sbc	a, #0x00
+      00006A 97               [ 1]  199 	ld	xl, a
+      00006B 7B 01            [ 1]  200 	ld	a, (0x01, sp)
+      00006D A2 00            [ 1]  201 	sbc	a, #0x00
+      00006F 95               [ 1]  202 	ld	xh, a
+      000070 17 03            [ 2]  203 	ldw	(0x03, sp), y
+      000072 1F 01            [ 2]  204 	ldw	(0x01, sp), x
+                                    205 ;	blink.c: 52: for (a = 0; a < 16000; ++a)
+      000074 90 5D            [ 2]  206 	tnzw	y
+      000076 26 E7            [ 1]  207 	jrne	00104$
+      000078 5D               [ 2]  208 	tnzw	x
+      000079 26 E4            [ 1]  209 	jrne	00104$
+      00007B 5B 04            [ 2]  210 	addw	sp, #4
+      00007D 81               [ 4]  211 	ret
+                                    212 ;	blink.c: 58: void long_pulse (void){
+                                    213 ;	-----------------------------------------
+                                    214 ;	 function long_pulse
+                                    215 ;	-----------------------------------------
+      00007E                        216 _long_pulse:
+                                    217 ;	blink.c: 59: PB_ODR = (1 << LED_PIN);
+      00007E 35 20 50 05      [ 1]  218 	mov	0x5005+0, #0x20
+                                    219 ;	blink.c: 60: delayTenMicro();
+      000082 CDr00r55         [ 4]  220 	call	_delayTenMicro
+                                    221 ;	blink.c: 61: delayTenMicro();
+      000085 CDr00r55         [ 4]  222 	call	_delayTenMicro
+                                    223 ;	blink.c: 62: delayTenMicro();
+      000088 CDr00r55         [ 4]  224 	call	_delayTenMicro
+                                    225 ;	blink.c: 63: PB_ODR = (0 << LED_PIN);
+      00008B 35 00 50 05      [ 1]  226 	mov	0x5005+0, #0x00
+                                    227 ;	blink.c: 64: delayTenMicro();
+      00008F CDr00r55         [ 4]  228 	call	_delayTenMicro
+                                    229 ;	blink.c: 65: delayTenMicro();
+      000092 CDr00r55         [ 4]  230 	call	_delayTenMicro
+                                    231 ;	blink.c: 66: delayTenMicro();
+      000095 CCr00r55         [ 2]  232 	jp	_delayTenMicro
+                                    233 ;	blink.c: 70: void short_pulse (void){
+                                    234 ;	-----------------------------------------
+                                    235 ;	 function short_pulse
+                                    236 ;	-----------------------------------------
+      000098                        237 _short_pulse:
+                                    238 ;	blink.c: 71: PB_ODR = (1 << LED_PIN);
+      000098 35 20 50 05      [ 1]  239 	mov	0x5005+0, #0x20
+                                    240 ;	blink.c: 72: delayTenMicro();
+      00009C CDr00r55         [ 4]  241 	call	_delayTenMicro
+                                    242 ;	blink.c: 73: PB_ODR = (0 << LED_PIN);
+      00009F 35 00 50 05      [ 1]  243 	mov	0x5005+0, #0x00
+                                    244 ;	blink.c: 74: delayTenMicro();
+      0000A3 CCr00r55         [ 2]  245 	jp	_delayTenMicro
+                                    246 ;	blink.c: 79: void send(int sensor, int value)
+                                    247 ;	-----------------------------------------
+                                    248 ;	 function send
+                                    249 ;	-----------------------------------------
+      0000A6                        250 _send:
+      0000A6 52 02            [ 2]  251 	sub	sp, #2
+                                    252 ;	blink.c: 82: for (i=0;i<8;++i)
+      0000A8 5F               [ 1]  253 	clrw	x
+      0000A9 1F 01            [ 2]  254 	ldw	(0x01, sp), x
+      0000AB                        255 00109$:
+                                    256 ;	blink.c: 84: if (sensor & (1<<i))  short_pulse();
+      0000AB AE 00 01         [ 2]  257 	ldw	x, #0x0001
+      0000AE 7B 02            [ 1]  258 	ld	a, (0x02, sp)
+      0000B0 27 04            [ 1]  259 	jreq	00138$
+      0000B2                        260 00137$:
+      0000B2 58               [ 2]  261 	sllw	x
+      0000B3 4A               [ 1]  262 	dec	a
+      0000B4 26 FC            [ 1]  263 	jrne	00137$
+      0000B6                        264 00138$:
+      0000B6 9F               [ 1]  265 	ld	a, xl
+      0000B7 14 06            [ 1]  266 	and	a, (0x06, sp)
+      0000B9 02               [ 1]  267 	rlwa	x
+      0000BA 14 05            [ 1]  268 	and	a, (0x05, sp)
+      0000BC 95               [ 1]  269 	ld	xh, a
+      0000BD 5D               [ 2]  270 	tnzw	x
+      0000BE 27 05            [ 1]  271 	jreq	00102$
+      0000C0 CDr00r98         [ 4]  272 	call	_short_pulse
+      0000C3 20 03            [ 2]  273 	jra	00110$
+      0000C5                        274 00102$:
+                                    275 ;	blink.c: 86: long_pulse();
+      0000C5 CDr00r7E         [ 4]  276 	call	_long_pulse
+      0000C8                        277 00110$:
+                                    278 ;	blink.c: 82: for (i=0;i<8;++i)
+      0000C8 1E 01            [ 2]  279 	ldw	x, (0x01, sp)
+      0000CA 5C               [ 2]  280 	incw	x
+      0000CB 1F 01            [ 2]  281 	ldw	(0x01, sp), x
+      0000CD 1E 01            [ 2]  282 	ldw	x, (0x01, sp)
+      0000CF A3 00 08         [ 2]  283 	cpw	x, #0x0008
+      0000D2 2F D7            [ 1]  284 	jrslt	00109$
+                                    285 ;	blink.c: 89: for (i=0;i<8;++i)
+      0000D4 5F               [ 1]  286 	clrw	x
+      0000D5 1F 01            [ 2]  287 	ldw	(0x01, sp), x
+      0000D7                        288 00111$:
+                                    289 ;	blink.c: 91: if (value & (1<<i))  short_pulse();
+      0000D7 AE 00 01         [ 2]  290 	ldw	x, #0x0001
+      0000DA 7B 02            [ 1]  291 	ld	a, (0x02, sp)
+      0000DC 27 04            [ 1]  292 	jreq	00142$
+      0000DE                        293 00141$:
+      0000DE 58               [ 2]  294 	sllw	x
+      0000DF 4A               [ 1]  295 	dec	a
+      0000E0 26 FC            [ 1]  296 	jrne	00141$
+      0000E2                        297 00142$:
+      0000E2 9F               [ 1]  298 	ld	a, xl
+      0000E3 14 08            [ 1]  299 	and	a, (0x08, sp)
+      0000E5 02               [ 1]  300 	rlwa	x
+      0000E6 14 07            [ 1]  301 	and	a, (0x07, sp)
+      0000E8 95               [ 1]  302 	ld	xh, a
+      0000E9 5D               [ 2]  303 	tnzw	x
+      0000EA 27 05            [ 1]  304 	jreq	00106$
+      0000EC CDr00r98         [ 4]  305 	call	_short_pulse
+      0000EF 20 03            [ 2]  306 	jra	00112$
+      0000F1                        307 00106$:
+                                    308 ;	blink.c: 93: long_pulse();
+      0000F1 CDr00r7E         [ 4]  309 	call	_long_pulse
+      0000F4                        310 00112$:
+                                    311 ;	blink.c: 89: for (i=0;i<8;++i)
+      0000F4 1E 01            [ 2]  312 	ldw	x, (0x01, sp)
+      0000F6 5C               [ 2]  313 	incw	x
+      0000F7 1F 01            [ 2]  314 	ldw	(0x01, sp), x
+      0000F9 1E 01            [ 2]  315 	ldw	x, (0x01, sp)
+      0000FB A3 00 08         [ 2]  316 	cpw	x, #0x0008
+      0000FE 2F D7            [ 1]  317 	jrslt	00111$
+      000100 5B 02            [ 2]  318 	addw	sp, #2
+      000102 81               [ 4]  319 	ret
+                                    320 ;	blink.c: 101: void DS18B20_Init(void)
+                                    321 ;	-----------------------------------------
+                                    322 ;	 function DS18B20_Init
+                                    323 ;	-----------------------------------------
+      000103                        324 _DS18B20_Init:
+                                    325 ;	blink.c: 103: DS18B20_DQ_OUT;   
+      000103 AE 50 02         [ 2]  326 	ldw	x, #0x5002
+      000106 F6               [ 1]  327 	ld	a, (x)
+      000107 AA 08            [ 1]  328 	or	a, #0x08
+      000109 F7               [ 1]  329 	ld	(x), a
+                                    330 ;	blink.c: 104: DS18B20_DQ_PUSH_PULL;    
+      00010A AE 50 03         [ 2]  331 	ldw	x, #0x5003
+      00010D F6               [ 1]  332 	ld	a, (x)
+      00010E AA 08            [ 1]  333 	or	a, #0x08
+      000110 F7               [ 1]  334 	ld	(x), a
+                                    335 ;	blink.c: 105: DS18B20_DQ_HIGH;   
+      000111 AE 50 00         [ 2]  336 	ldw	x, #0x5000
+      000114 F6               [ 1]  337 	ld	a, (x)
+      000115 AA 08            [ 1]  338 	or	a, #0x08
+      000117 F7               [ 1]  339 	ld	(x), a
+                                    340 ;	blink.c: 106: _delay_us(10);
+      000118 4B 0A            [ 1]  341 	push	#0x0a
+      00011A 4B 00            [ 1]  342 	push	#0x00
+      00011C CDr00r40         [ 4]  343 	call	__delay_us
+      00011F 5B 02            [ 2]  344 	addw	sp, #2
+                                    345 ;	blink.c: 107: DS18B20_DQ_LOW;   
+      000121 AE 50 00         [ 2]  346 	ldw	x, #0x5000
+      000124 F6               [ 1]  347 	ld	a, (x)
+      000125 A4 F7            [ 1]  348 	and	a, #0xf7
+      000127 F7               [ 1]  349 	ld	(x), a
+                                    350 ;	blink.c: 108: _delay_us(600);     //????
+      000128 4B 58            [ 1]  351 	push	#0x58
+      00012A 4B 02            [ 1]  352 	push	#0x02
+      00012C CDr00r40         [ 4]  353 	call	__delay_us
+      00012F 5B 02            [ 2]  354 	addw	sp, #2
+                                    355 ;	blink.c: 110: DS18B20_DQ_IN;   
+      000131 AE 50 02         [ 2]  356 	ldw	x, #0x5002
+      000134 F6               [ 1]  357 	ld	a, (x)
+      000135 A4 F7            [ 1]  358 	and	a, #0xf7
+      000137 F7               [ 1]  359 	ld	(x), a
+                                    360 ;	blink.c: 111: DS18B20_DQ_PULL_UP;    
+      000138 AE 50 03         [ 2]  361 	ldw	x, #0x5003
+      00013B F6               [ 1]  362 	ld	a, (x)
+      00013C AA 08            [ 1]  363 	or	a, #0x08
+      00013E F7               [ 1]  364 	ld	(x), a
+                                    365 ;	blink.c: 112: _delay_us(100);     
+      00013F 4B 64            [ 1]  366 	push	#0x64
+      000141 4B 00            [ 1]  367 	push	#0x00
+      000143 CDr00r40         [ 4]  368 	call	__delay_us
+      000146 5B 02            [ 2]  369 	addw	sp, #2
+                                    370 ;	blink.c: 114: _delay_us(400);
+      000148 4B 90            [ 1]  371 	push	#0x90
+      00014A 4B 01            [ 1]  372 	push	#0x01
+      00014C CDr00r40         [ 4]  373 	call	__delay_us
+      00014F 5B 02            [ 2]  374 	addw	sp, #2
+      000151 81               [ 4]  375 	ret
+                                    376 ;	blink.c: 118: void DS18B20_WriteByte(unsigned char _data)
+                                    377 ;	-----------------------------------------
+                                    378 ;	 function DS18B20_WriteByte
+                                    379 ;	-----------------------------------------
+      000152                        380 _DS18B20_WriteByte:
+      000152 88               [ 1]  381 	push	a
+                                    382 ;	blink.c: 122: DS18B20_DQ_OUT;
+      000153 AE 50 02         [ 2]  383 	ldw	x, #0x5002
+      000156 F6               [ 1]  384 	ld	a, (x)
+      000157 AA 08            [ 1]  385 	or	a, #0x08
+      000159 F7               [ 1]  386 	ld	(x), a
+                                    387 ;	blink.c: 123: for (i = 0; i < 8; i++)
+      00015A 0F 01            [ 1]  388 	clr	(0x01, sp)
+      00015C                        389 00104$:
+                                    390 ;	blink.c: 125: DS18B20_DQ_LOW;
+      00015C AE 50 00         [ 2]  391 	ldw	x, #0x5000
+      00015F F6               [ 1]  392 	ld	a, (x)
+      000160 A4 F7            [ 1]  393 	and	a, #0xf7
+      000162 F7               [ 1]  394 	ld	(x), a
+                                    395 ;	blink.c: 126: _delay_us(2);
+      000163 4B 02            [ 1]  396 	push	#0x02
+      000165 4B 00            [ 1]  397 	push	#0x00
+      000167 CDr00r40         [ 4]  398 	call	__delay_us
+      00016A 5B 02            [ 2]  399 	addw	sp, #2
+                                    400 ;	blink.c: 127: if (_data & 0x01)
+      00016C 7B 04            [ 1]  401 	ld	a, (0x04, sp)
+      00016E 44               [ 1]  402 	srl	a
+      00016F 24 07            [ 1]  403 	jrnc	00102$
+                                    404 ;	blink.c: 129: DS18B20_DQ_HIGH;
+      000171 AE 50 00         [ 2]  405 	ldw	x, #0x5000
+      000174 F6               [ 1]  406 	ld	a, (x)
+      000175 AA 08            [ 1]  407 	or	a, #0x08
+      000177 F7               [ 1]  408 	ld	(x), a
+      000178                        409 00102$:
+                                    410 ;	blink.c: 131: _data >>= 1;
+      000178 7B 04            [ 1]  411 	ld	a, (0x04, sp)
+      00017A 44               [ 1]  412 	srl	a
+      00017B 6B 04            [ 1]  413 	ld	(0x04, sp), a
+                                    414 ;	blink.c: 132: _delay_us(60);
+      00017D 4B 3C            [ 1]  415 	push	#0x3c
+      00017F 4B 00            [ 1]  416 	push	#0x00
+      000181 CDr00r40         [ 4]  417 	call	__delay_us
+      000184 5B 02            [ 2]  418 	addw	sp, #2
+                                    419 ;	blink.c: 133: DS18B20_DQ_HIGH;
+      000186 AE 50 00         [ 2]  420 	ldw	x, #0x5000
+      000189 F6               [ 1]  421 	ld	a, (x)
+      00018A AA 08            [ 1]  422 	or	a, #0x08
+      00018C F7               [ 1]  423 	ld	(x), a
+                                    424 ;	blink.c: 123: for (i = 0; i < 8; i++)
+      00018D 0C 01            [ 1]  425 	inc	(0x01, sp)
+      00018F 7B 01            [ 1]  426 	ld	a, (0x01, sp)
+      000191 A1 08            [ 1]  427 	cp	a, #0x08
+      000193 25 C7            [ 1]  428 	jrc	00104$
+      000195 84               [ 1]  429 	pop	a
+      000196 81               [ 4]  430 	ret
+                                    431 ;	blink.c: 137: unsigned char DS18B20_ReadByte(void)
+                                    432 ;	-----------------------------------------
+                                    433 ;	 function DS18B20_ReadByte
+                                    434 ;	-----------------------------------------
+      000197                        435 _DS18B20_ReadByte:
+      000197 52 02            [ 2]  436 	sub	sp, #2
+                                    437 ;	blink.c: 139: unsigned char i = 0, _data = 0;
+      000199 0F 02            [ 1]  438 	clr	(0x02, sp)
+                                    439 ;	blink.c: 141: for (i = 0; i < 8; i++)
+      00019B 0F 01            [ 1]  440 	clr	(0x01, sp)
+      00019D                        441 00104$:
+                                    442 ;	blink.c: 143: DS18B20_DQ_OUT;
+      00019D AE 50 02         [ 2]  443 	ldw	x, #0x5002
+      0001A0 F6               [ 1]  444 	ld	a, (x)
+      0001A1 AA 08            [ 1]  445 	or	a, #0x08
+      0001A3 F7               [ 1]  446 	ld	(x), a
+                                    447 ;	blink.c: 144: DS18B20_DQ_LOW;
+      0001A4 AE 50 00         [ 2]  448 	ldw	x, #0x5000
+      0001A7 F6               [ 1]  449 	ld	a, (x)
+      0001A8 A4 F7            [ 1]  450 	and	a, #0xf7
+      0001AA F7               [ 1]  451 	ld	(x), a
+                                    452 ;	blink.c: 145: _delay_us(5);
+      0001AB 4B 05            [ 1]  453 	push	#0x05
+      0001AD 4B 00            [ 1]  454 	push	#0x00
+      0001AF CDr00r40         [ 4]  455 	call	__delay_us
+      0001B2 5B 02            [ 2]  456 	addw	sp, #2
+                                    457 ;	blink.c: 146: _data >>= 1;
+      0001B4 04 02            [ 1]  458 	srl	(0x02, sp)
+                                    459 ;	blink.c: 147: DS18B20_DQ_HIGH;
+      0001B6 AE 50 00         [ 2]  460 	ldw	x, #0x5000
+      0001B9 F6               [ 1]  461 	ld	a, (x)
+      0001BA AA 08            [ 1]  462 	or	a, #0x08
+      0001BC F7               [ 1]  463 	ld	(x), a
+                                    464 ;	blink.c: 148: DS18B20_DQ_IN;
+      0001BD AE 50 02         [ 2]  465 	ldw	x, #0x5002
+      0001C0 F6               [ 1]  466 	ld	a, (x)
+      0001C1 A4 F7            [ 1]  467 	and	a, #0xf7
+      0001C3 F7               [ 1]  468 	ld	(x), a
+                                    469 ;	blink.c: 149: if (DS18B20_DQ_VALUE)
+      0001C4 AE 50 01         [ 2]  470 	ldw	x, #0x5001
+      0001C7 F6               [ 1]  471 	ld	a, (x)
+      0001C8 A5 08            [ 1]  472 	bcp	a, #0x08
+      0001CA 27 06            [ 1]  473 	jreq	00102$
+                                    474 ;	blink.c: 151: _data |= 0x80;
+      0001CC 7B 02            [ 1]  475 	ld	a, (0x02, sp)
+      0001CE AA 80            [ 1]  476 	or	a, #0x80
+      0001D0 6B 02            [ 1]  477 	ld	(0x02, sp), a
+      0001D2                        478 00102$:
+                                    479 ;	blink.c: 153: DS18B20_DQ_OUT; 
+      0001D2 AE 50 02         [ 2]  480 	ldw	x, #0x5002
+      0001D5 F6               [ 1]  481 	ld	a, (x)
+      0001D6 AA 08            [ 1]  482 	or	a, #0x08
+      0001D8 F7               [ 1]  483 	ld	(x), a
+                                    484 ;	blink.c: 154: DS18B20_DQ_HIGH;
+      0001D9 AE 50 00         [ 2]  485 	ldw	x, #0x5000
+      0001DC F6               [ 1]  486 	ld	a, (x)
+      0001DD AA 08            [ 1]  487 	or	a, #0x08
+      0001DF F7               [ 1]  488 	ld	(x), a
+                                    489 ;	blink.c: 155: _delay_us(60);
+      0001E0 4B 3C            [ 1]  490 	push	#0x3c
+      0001E2 4B 00            [ 1]  491 	push	#0x00
+      0001E4 CDr00r40         [ 4]  492 	call	__delay_us
+      0001E7 5B 02            [ 2]  493 	addw	sp, #2
+                                    494 ;	blink.c: 141: for (i = 0; i < 8; i++)
+      0001E9 0C 01            [ 1]  495 	inc	(0x01, sp)
+      0001EB 7B 01            [ 1]  496 	ld	a, (0x01, sp)
+      0001ED A1 08            [ 1]  497 	cp	a, #0x08
+      0001EF 25 AC            [ 1]  498 	jrc	00104$
+                                    499 ;	blink.c: 158: return _data;
+      0001F1 7B 02            [ 1]  500 	ld	a, (0x02, sp)
+      0001F3 5B 02            [ 2]  501 	addw	sp, #2
+      0001F5 81               [ 4]  502 	ret
+                                    503 ;	blink.c: 161: float DS18B20_ReadTemperature(void)
+                                    504 ;	-----------------------------------------
+                                    505 ;	 function DS18B20_ReadTemperature
+                                    506 ;	-----------------------------------------
+      0001F6                        507 _DS18B20_ReadTemperature:
+      0001F6 52 0E            [ 2]  508 	sub	sp, #14
+                                    509 ;	blink.c: 175: DS18B20_Init();
+      0001F8 CDr01r03         [ 4]  510 	call	_DS18B20_Init
+                                    511 ;	blink.c: 176: DS18B20_WriteByte(0xcc);
+      0001FB 4B CC            [ 1]  512 	push	#0xcc
+      0001FD CDr01r52         [ 4]  513 	call	_DS18B20_WriteByte
+      000200 84               [ 1]  514 	pop	a
+                                    515 ;	blink.c: 177: DS18B20_WriteByte(0x44);
+      000201 4B 44            [ 1]  516 	push	#0x44
+      000203 CDr01r52         [ 4]  517 	call	_DS18B20_WriteByte
+      000206 84               [ 1]  518 	pop	a
+                                    519 ;	blink.c: 179: DS18B20_Init();
+      000207 CDr01r03         [ 4]  520 	call	_DS18B20_Init
+                                    521 ;	blink.c: 180: DS18B20_WriteByte(0xcc);
+      00020A 4B CC            [ 1]  522 	push	#0xcc
+      00020C CDr01r52         [ 4]  523 	call	_DS18B20_WriteByte
+      00020F 84               [ 1]  524 	pop	a
+                                    525 ;	blink.c: 181: DS18B20_WriteByte(0xbe);
+      000210 4B BE            [ 1]  526 	push	#0xbe
+      000212 CDr01r52         [ 4]  527 	call	_DS18B20_WriteByte
+      000215 84               [ 1]  528 	pop	a
+                                    529 ;	blink.c: 183: temp = DS18B20_ReadByte();
+      000216 CDr01r97         [ 4]  530 	call	_DS18B20_ReadByte
+                                    531 ;	blink.c: 184: t = (((temp & 0xf0) >> 4) + (temp & 0x07) * 0.125); 
+      000219 95               [ 1]  532 	ld	xh, a
+      00021A A4 F0            [ 1]  533 	and	a, #0xf0
+      00021C 4E               [ 1]  534 	swap	a
+      00021D A4 0F            [ 1]  535 	and	a, #0x0f
+      00021F 6B 02            [ 1]  536 	ld	(0x02, sp), a
+      000221 0F 01            [ 1]  537 	clr	(0x01, sp)
+      000223 9E               [ 1]  538 	ld	a, xh
+      000224 A4 07            [ 1]  539 	and	a, #0x07
+      000226 88               [ 1]  540 	push	a
+      000227 CDr00r00         [ 4]  541 	call	___uchar2fs
+      00022A 84               [ 1]  542 	pop	a
+      00022B 89               [ 2]  543 	pushw	x
+      00022C 90 89            [ 2]  544 	pushw	y
+      00022E 5F               [ 1]  545 	clrw	x
+      00022F 89               [ 2]  546 	pushw	x
+      000230 4B 00            [ 1]  547 	push	#0x00
+      000232 4B 3E            [ 1]  548 	push	#0x3e
+      000234 CDr00r00         [ 4]  549 	call	___fsmul
+      000237 5B 08            [ 2]  550 	addw	sp, #8
+      000239 17 07            [ 2]  551 	ldw	(0x07, sp), y
+      00023B 89               [ 2]  552 	pushw	x
+      00023C 16 03            [ 2]  553 	ldw	y, (0x03, sp)
+      00023E 90 89            [ 2]  554 	pushw	y
+      000240 CDr00r00         [ 4]  555 	call	___sint2fs
+      000243 5B 02            [ 2]  556 	addw	sp, #2
+      000245 1F 0F            [ 2]  557 	ldw	(0x0f, sp), x
+      000247 1E 09            [ 2]  558 	ldw	x, (0x09, sp)
+      000249 89               [ 2]  559 	pushw	x
+      00024A 1E 11            [ 2]  560 	ldw	x, (0x11, sp)
+      00024C 89               [ 2]  561 	pushw	x
+      00024D 90 89            [ 2]  562 	pushw	y
+      00024F CDr00r00         [ 4]  563 	call	___fsadd
+      000252 5B 08            [ 2]  564 	addw	sp, #8
+      000254 1F 05            [ 2]  565 	ldw	(0x05, sp), x
+      000256 17 03            [ 2]  566 	ldw	(0x03, sp), y
+                                    567 ;	blink.c: 185: temp = DS18B20_ReadByte();
+      000258 CDr01r97         [ 4]  568 	call	_DS18B20_ReadByte
+                                    569 ;	blink.c: 186: t += ((temp & 0x0f) << 4);
+      00025B A4 0F            [ 1]  570 	and	a, #0x0f
+      00025D 5F               [ 1]  571 	clrw	x
+      00025E 97               [ 1]  572 	ld	xl, a
+      00025F 58               [ 2]  573 	sllw	x
+      000260 58               [ 2]  574 	sllw	x
+      000261 58               [ 2]  575 	sllw	x
+      000262 58               [ 2]  576 	sllw	x
+      000263 89               [ 2]  577 	pushw	x
+      000264 CDr00r00         [ 4]  578 	call	___sint2fs
+      000267 5B 02            [ 2]  579 	addw	sp, #2
+      000269 89               [ 2]  580 	pushw	x
+      00026A 90 89            [ 2]  581 	pushw	y
+      00026C 1E 09            [ 2]  582 	ldw	x, (0x09, sp)
+      00026E 89               [ 2]  583 	pushw	x
+      00026F 1E 09            [ 2]  584 	ldw	x, (0x09, sp)
+      000271 89               [ 2]  585 	pushw	x
+      000272 CDr00r00         [ 4]  586 	call	___fsadd
+                                    587 ;	blink.c: 187: return t;
+      000275 5B 16            [ 2]  588 	addw	sp, #22
+      000277 81               [ 4]  589 	ret
+                                    590 ;	blink.c: 194: void main() {
+                                    591 ;	-----------------------------------------
+                                    592 ;	 function main
+                                    593 ;	-----------------------------------------
+      000278                        594 _main:
+      000278 52 10            [ 2]  595 	sub	sp, #16
+                                    596 ;	blink.c: 198: InitializeSystemClock();
+      00027A CDr00r00         [ 4]  597 	call	_InitializeSystemClock
+                                    598 ;	blink.c: 199: PB_DDR |= (1 << LED_PIN);
+      00027D AE 50 07         [ 2]  599 	ldw	x, #0x5007
+      000280 F6               [ 1]  600 	ld	a, (x)
+      000281 AA 20            [ 1]  601 	or	a, #0x20
+      000283 F7               [ 1]  602 	ld	(x), a
+                                    603 ;	blink.c: 200: PB_CR1 |= (1 << LED_PIN);
+      000284 AE 50 08         [ 2]  604 	ldw	x, #0x5008
+      000287 F6               [ 1]  605 	ld	a, (x)
+      000288 AA 20            [ 1]  606 	or	a, #0x20
+      00028A F7               [ 1]  607 	ld	(x), a
+                                    608 ;	blink.c: 202: while (1) {
+      00028B                        609 00114$:
+                                    610 ;	blink.c: 203: send(3,3); //start message
+      00028B 4B 03            [ 1]  611 	push	#0x03
+      00028D 4B 00            [ 1]  612 	push	#0x00
+      00028F 4B 03            [ 1]  613 	push	#0x03
+      000291 4B 00            [ 1]  614 	push	#0x00
+      000293 CDr00rA6         [ 4]  615 	call	_send
+      000296 5B 04            [ 2]  616 	addw	sp, #4
+                                    617 ;	blink.c: 207: objTemp = DS18B20_ReadTemperature();  
+      000298 CDr01rF6         [ 4]  618 	call	_DS18B20_ReadTemperature
+      00029B 1F 03            [ 2]  619 	ldw	(0x03, sp), x
+      00029D 17 01            [ 2]  620 	ldw	(0x01, sp), y
+                                    621 ;	blink.c: 208: while (objTemp > 1000) {
+      00029F                        622 00101$:
+      00029F 5F               [ 1]  623 	clrw	x
+      0002A0 89               [ 2]  624 	pushw	x
+      0002A1 4B 7A            [ 1]  625 	push	#0x7a
+      0002A3 4B 44            [ 1]  626 	push	#0x44
+      0002A5 1E 07            [ 2]  627 	ldw	x, (0x07, sp)
+      0002A7 89               [ 2]  628 	pushw	x
+      0002A8 1E 07            [ 2]  629 	ldw	x, (0x07, sp)
+      0002AA 89               [ 2]  630 	pushw	x
+      0002AB CDr00r00         [ 4]  631 	call	___fsgt
+      0002AE 5B 08            [ 2]  632 	addw	sp, #8
+      0002B0 4D               [ 1]  633 	tnz	a
+      0002B1 27 17            [ 1]  634 	jreq	00121$
+                                    635 ;	blink.c: 210: objTemp-=1000;
+      0002B3 5F               [ 1]  636 	clrw	x
+      0002B4 89               [ 2]  637 	pushw	x
+      0002B5 4B 7A            [ 1]  638 	push	#0x7a
+      0002B7 4B 44            [ 1]  639 	push	#0x44
+      0002B9 1E 07            [ 2]  640 	ldw	x, (0x07, sp)
+      0002BB 89               [ 2]  641 	pushw	x
+      0002BC 1E 07            [ 2]  642 	ldw	x, (0x07, sp)
+      0002BE 89               [ 2]  643 	pushw	x
+      0002BF CDr00r00         [ 4]  644 	call	___fssub
+      0002C2 5B 08            [ 2]  645 	addw	sp, #8
+      0002C4 1F 03            [ 2]  646 	ldw	(0x03, sp), x
+      0002C6 17 01            [ 2]  647 	ldw	(0x01, sp), y
+      0002C8 20 D5            [ 2]  648 	jra	00101$
+                                    649 ;	blink.c: 212: while (objTemp > 100) {
+      0002CA                        650 00121$:
+      0002CA 5F               [ 1]  651 	clrw	x
+      0002CB 1F 05            [ 2]  652 	ldw	(0x05, sp), x
+      0002CD                        653 00104$:
+      0002CD 5F               [ 1]  654 	clrw	x
+      0002CE 89               [ 2]  655 	pushw	x
+      0002CF 4B C8            [ 1]  656 	push	#0xc8
+      0002D1 4B 42            [ 1]  657 	push	#0x42
+      0002D3 1E 07            [ 2]  658 	ldw	x, (0x07, sp)
+      0002D5 89               [ 2]  659 	pushw	x
+      0002D6 1E 07            [ 2]  660 	ldw	x, (0x07, sp)
+      0002D8 89               [ 2]  661 	pushw	x
+      0002D9 CDr00r00         [ 4]  662 	call	___fsgt
+      0002DC 5B 08            [ 2]  663 	addw	sp, #8
+      0002DE 4D               [ 1]  664 	tnz	a
+      0002DF 27 1D            [ 1]  665 	jreq	00128$
+                                    666 ;	blink.c: 213: derde+=1;
+      0002E1 1E 05            [ 2]  667 	ldw	x, (0x05, sp)
+      0002E3 5C               [ 2]  668 	incw	x
+      0002E4 1F 05            [ 2]  669 	ldw	(0x05, sp), x
+                                    670 ;	blink.c: 214: objTemp-=100;
+      0002E6 5F               [ 1]  671 	clrw	x
+      0002E7 89               [ 2]  672 	pushw	x
+      0002E8 4B C8            [ 1]  673 	push	#0xc8
+      0002EA 4B 42            [ 1]  674 	push	#0x42
+      0002EC 1E 07            [ 2]  675 	ldw	x, (0x07, sp)
+      0002EE 89               [ 2]  676 	pushw	x
+      0002EF 1E 07            [ 2]  677 	ldw	x, (0x07, sp)
+      0002F1 89               [ 2]  678 	pushw	x
+      0002F2 CDr00r00         [ 4]  679 	call	___fssub
+      0002F5 5B 08            [ 2]  680 	addw	sp, #8
+      0002F7 51               [ 1]  681 	exgw	x, y
+      0002F8 17 03            [ 2]  682 	ldw	(0x03, sp), y
+      0002FA 1F 01            [ 2]  683 	ldw	(0x01, sp), x
+      0002FC 20 CF            [ 2]  684 	jra	00104$
+                                    685 ;	blink.c: 216: while (objTemp > 10) {
+      0002FE                        686 00128$:
+      0002FE 16 05            [ 2]  687 	ldw	y, (0x05, sp)
+      000300 17 0B            [ 2]  688 	ldw	(0x0b, sp), y
+      000302 5F               [ 1]  689 	clrw	x
+      000303 1F 09            [ 2]  690 	ldw	(0x09, sp), x
+      000305                        691 00107$:
+      000305 5F               [ 1]  692 	clrw	x
+      000306 89               [ 2]  693 	pushw	x
+      000307 4B 20            [ 1]  694 	push	#0x20
+      000309 4B 41            [ 1]  695 	push	#0x41
+      00030B 1E 07            [ 2]  696 	ldw	x, (0x07, sp)
+      00030D 89               [ 2]  697 	pushw	x
+      00030E 1E 07            [ 2]  698 	ldw	x, (0x07, sp)
+      000310 89               [ 2]  699 	pushw	x
+      000311 CDr00r00         [ 4]  700 	call	___fsgt
+      000314 5B 08            [ 2]  701 	addw	sp, #8
+      000316 4D               [ 1]  702 	tnz	a
+      000317 27 1C            [ 1]  703 	jreq	00129$
+                                    704 ;	blink.c: 217: tweede+=1;
+      000319 1E 09            [ 2]  705 	ldw	x, (0x09, sp)
+      00031B 5C               [ 2]  706 	incw	x
+      00031C 1F 09            [ 2]  707 	ldw	(0x09, sp), x
+                                    708 ;	blink.c: 218: objTemp-=10;
+      00031E 5F               [ 1]  709 	clrw	x
+      00031F 89               [ 2]  710 	pushw	x
+      000320 4B 20            [ 1]  711 	push	#0x20
+      000322 4B 41            [ 1]  712 	push	#0x41
+      000324 1E 07            [ 2]  713 	ldw	x, (0x07, sp)
+      000326 89               [ 2]  714 	pushw	x
+      000327 1E 07            [ 2]  715 	ldw	x, (0x07, sp)
+      000329 89               [ 2]  716 	pushw	x
+      00032A CDr00r00         [ 4]  717 	call	___fssub
+      00032D 5B 08            [ 2]  718 	addw	sp, #8
+      00032F 1F 03            [ 2]  719 	ldw	(0x03, sp), x
+      000331 17 01            [ 2]  720 	ldw	(0x01, sp), y
+      000333 20 D0            [ 2]  721 	jra	00107$
+                                    722 ;	blink.c: 220: while (objTemp > 0)
+      000335                        723 00129$:
+      000335 16 09            [ 2]  724 	ldw	y, (0x09, sp)
+      000337 17 0D            [ 2]  725 	ldw	(0x0d, sp), y
+      000339 5F               [ 1]  726 	clrw	x
+      00033A 1F 07            [ 2]  727 	ldw	(0x07, sp), x
+      00033C                        728 00110$:
+      00033C 5F               [ 1]  729 	clrw	x
+      00033D 89               [ 2]  730 	pushw	x
+      00033E 5F               [ 1]  731 	clrw	x
+      00033F 89               [ 2]  732 	pushw	x
+      000340 1E 07            [ 2]  733 	ldw	x, (0x07, sp)
+      000342 89               [ 2]  734 	pushw	x
+      000343 1E 07            [ 2]  735 	ldw	x, (0x07, sp)
+      000345 89               [ 2]  736 	pushw	x
+      000346 CDr00r00         [ 4]  737 	call	___fsgt
+      000349 5B 08            [ 2]  738 	addw	sp, #8
+      00034B 4D               [ 1]  739 	tnz	a
+      00034C 27 1C            [ 1]  740 	jreq	00112$
+                                    741 ;	blink.c: 222: eerste+=1;
+      00034E 1E 07            [ 2]  742 	ldw	x, (0x07, sp)
+      000350 5C               [ 2]  743 	incw	x
+      000351 1F 07            [ 2]  744 	ldw	(0x07, sp), x
+                                    745 ;	blink.c: 223: objTemp-=1;
+      000353 5F               [ 1]  746 	clrw	x
+      000354 89               [ 2]  747 	pushw	x
+      000355 4B 80            [ 1]  748 	push	#0x80
+      000357 4B 3F            [ 1]  749 	push	#0x3f
+      000359 1E 07            [ 2]  750 	ldw	x, (0x07, sp)
+      00035B 89               [ 2]  751 	pushw	x
+      00035C 1E 07            [ 2]  752 	ldw	x, (0x07, sp)
+      00035E 89               [ 2]  753 	pushw	x
+      00035F CDr00r00         [ 4]  754 	call	___fssub
+      000362 5B 08            [ 2]  755 	addw	sp, #8
+      000364 1F 03            [ 2]  756 	ldw	(0x03, sp), x
+      000366 17 01            [ 2]  757 	ldw	(0x01, sp), y
+      000368 20 D2            [ 2]  758 	jra	00110$
+      00036A                        759 00112$:
+                                    760 ;	blink.c: 226: temp=derde*100+tweede*10+eerste;
+      00036A 1E 0B            [ 2]  761 	ldw	x, (0x0b, sp)
+      00036C 89               [ 2]  762 	pushw	x
+      00036D 4B 64            [ 1]  763 	push	#0x64
+      00036F 4B 00            [ 1]  764 	push	#0x00
+      000371 CDr00r00         [ 4]  765 	call	__mulint
+      000374 5B 04            [ 2]  766 	addw	sp, #4
+      000376 1F 0F            [ 2]  767 	ldw	(0x0f, sp), x
+      000378 1E 0D            [ 2]  768 	ldw	x, (0x0d, sp)
+      00037A 89               [ 2]  769 	pushw	x
+      00037B 4B 0A            [ 1]  770 	push	#0x0a
+      00037D 4B 00            [ 1]  771 	push	#0x00
+      00037F CDr00r00         [ 4]  772 	call	__mulint
+      000382 5B 04            [ 2]  773 	addw	sp, #4
+      000384 72 FB 0F         [ 2]  774 	addw	x, (0x0f, sp)
+      000387 72 FB 07         [ 2]  775 	addw	x, (0x07, sp)
+                                    776 ;	blink.c: 229: send(99, temp);
+      00038A 89               [ 2]  777 	pushw	x
+      00038B 4B 63            [ 1]  778 	push	#0x63
+      00038D 4B 00            [ 1]  779 	push	#0x00
+      00038F CDr00rA6         [ 4]  780 	call	_send
+      000392 5B 04            [ 2]  781 	addw	sp, #4
+      000394 CCr02r8B         [ 2]  782 	jp	00114$
+      000397 5B 10            [ 2]  783 	addw	sp, #16
+      000399 81               [ 4]  784 	ret
+                                    785 	.area CODE
+                                    786 	.area INITIALIZER
+                                    787 	.area CABS (ABS)
